@@ -5,6 +5,7 @@
  * MIT Licensed
  */
 
+const { createClient } = require('mta-realtime-subway-departures');
 const request = require("request");
 const rp = require('request-promise');
 const async = require('async');
@@ -25,82 +26,79 @@ module.exports = NodeHelper.create({
 	},
 
 	socketNotificationReceived: function (notification, payload) {
-
 		if (notification === "CONFIG") {
 			const {
-				trains,
-				stopIds,
-				apiKey
-			} = payload;
-
-			this.STOP_IDS = stopIds; // set global
-			const urls = [];
-			Object.keys(trains).forEach(train => {
-				const mtaURL = this.getParams(apiKey, trains[train].code);
-				urls.push(mtaURL);
-			});
-
-			this.getData(urls);
+									stationIds,
+									apiKey
+							} = payload;
+			
+			const client = createClient(apiKey)
+			this.getData(client, stationIds);
 		}
 	},
 
-	getData: function (urls) {
-		let departureTimes = [];
+	getData: function (client, stationIds) {
+		const departures = []
+		/*
+					stations = [{
+						name: marcy av
+						Ntimes: [{ line: M, time: t1}, {line: J, time: t2}, {line: J, time: t3}, {line: M, time: t4}]
+						Stimes: [{ line: M, time: t1}, {line: J, time: t2}, {line: J, time: t3}, {line: M, time: t4}]
+					}]
+				*/
+		client.departures(stationIds).then(resp => {
+			const stations = resp
+			const departures = []
+			stations.forEach(({lines, name: stationName}) => {
+				// a line can have multiple trains
+				let times = []			
+				lines.forEach(({departures: {N, S} }) => {
+					const first4N  = N.splice(0,4).map(obj => {
+													obj.time = this.getMinutes(obj.time)
+													return obj
+												}).sort((a,b) => a.time - b.time)
+					const first4S = S.splice(0,4).map(obj => {
+													obj.time = this.getMinutes(obj.time)
+													return obj
+												}).sort((a,b) => a.time - b.time)
+					times.push({
+						nBound: first4N,
+						sBound: first4S
+					})
+				})
 
-		async.forEachOf(urls, (url, index, callback) => {
-			const requestOptions = {
-				method: "GET",
-				url: url,
-				encoding: null,
-			};
+				if (times.length > 1) {
+					const newTimes = []
+					const combinedNTimes = []
+					const combinedSTimes = []
+					times.forEach(({nBound, sBound}) => {
+						nBound.forEach(obj => combinedNTimes.push(obj))
+						sBound.forEach(obj => combinedSTimes.push(obj))
+					})
+					times = [{nBound: combinedNTimes.sort((a,b) => a.time - b.time).splice(0,4), sBound: combinedSTimes.sort((a,b) => a.time - b.time).splice(0,4)}]
+				}
 
-			rp(requestOptions).then((body) => {
-				const FeedMessage = GtfsRealtimeBinding.FeedMessage;
-				const feed = FeedMessage.decode(body);
-				const currentTime = new Date(Date.now());
-				this.STOP_IDS.forEach(stop => {
-					feed.entity.forEach(entity => {
-						if (entity.trip_update) {
-							entity.trip_update.stop_time_update.forEach(update => {
-								
-								if (update.stop_id === stop) {
-									const arrivalTime = update.arrival.time.low*1000;
-									const departureTime = update.departure.time.low*1000;
-									const time = arrivalTime <= 0 ? arrivalTime : departureTime;
-									const departureDiffInMin = date.subtract(new Date(time), currentTime).toMinutes();
-									
-									if (departureDiffInMin <= 30) {
-										departureTimes.push({
-											stop,
-											departureTime: departureDiffInMin,
-										});
-									}
-								}
-							});
-						}
-					});
-				});
-				// process result
-				callback();
+				departures.push({
+					name: stationName,
+					times
+				})
 			})
-			.catch(err => {
-				console.log('there was an error: ', err);
-			});
 
-
-		}, err => {
-			if (err) console.error(err.message);
-			let filteredKeys = new Set;
-			departureTimes = departureTimes.sort();
-			let finalDepartures = departureTimes.filter((obj) => {
-					const key = obj.stop;
-					const isNew = !filteredKeys.has(key);
-					if (isNew) filteredKeys.add(key);
-					return isNew;
-			});
-
-			this.sendSocketNotification('ON_DEPARTURE_TIME', finalDepartures)
-		});	
+			this.sendSocketNotification('ON_DEPARTURE_TIME', departures)
+		}).catch(err => {
+			console.error('Error with fetching departures: ', error)
+		})
 	},
+
+	getMinutes: time => {
+		const now = Math.round((new Date()).getTime() / 1000);
+		const diffInSec = time - now; // in seconds
+		let diffInMin = Math.floor(diffInSec / 60);
+
+		diffInMin = '0' + diffInMin % 60;
+
+		// Will display time in minutes format
+		return Number(diffInMin.substr(-2));
+	}
 });
 

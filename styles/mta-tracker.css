@@ -1,87 +1,99 @@
 .mta-tracker {
-	display: flex;
-	width: 100%;
-	font-family: "Roboto Condensed", sans-serif;
-	align-items: center;
-	justify-content: center;
-	flex-wrap: wrap;
-	color: white;
-	margin: 0 auto;
-	flex-direction: column;
-	font-size: 20px;
+  display: flex;
+  width: 350px;
+  font-family: 'Roboto Condensed', sans-serif;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: white;
+  margin: 0 auto;
+  flex-direction: column;
+  font-size: 20px;
 }
 
-.mta-tracker-title {
-	display: flex;
-	width: 100%;
-	justify-content: flex-start;
-	flex-direction: column;
-	margin-bottom: 5px;
+.station {
+  width: 100%;
 }
 
-.mta-tracker-title h3 {
-	margin: 0;
-	font-weight: 500;
-	line-height: 25px;
+.station h2 {
+  margin-bottom: 5px;
+  line-height: 30px;
+}
+
+.station h3 {
+  margin-top: 0;
+  font-weight: 500;
+  line-height: 25px;
+}
+
+.station .times {
+  margin-bottom: 20px;
 }
 
 .train {
   border: solid 1px white;
-  width: 300px;
   height: 50px;
   display: flex;
   align-items: center;
-	justify-content: center;
-	text-transform: uppercase;
+  justify-content: center;
+  text-transform: uppercase;
+  box-sizing: border-box;
 }
-  
+
 .train :not(:first-child):not(:last-child) {
-	border-top: none;
+  border-top: none;
 }
 
 .train:last-child {
-	border-top: none;
+  border-top: none;
 }
 
 .train > div {
-	display: flex;
-	height: 100%;
-	margin: 0 10px;
-	align-items: center;
+  display: flex;
+  height: 100%;
+  margin: 0 10px;
+  align-items: center;
 }
-  
+
 .train .logo {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-grow: 1;
 }
-	
+
 .train .logo .name {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 40px;
-	height: 40px;
-	border-radius: 100%;
-	color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  color: white;
 }
 
 .train .logo .name.G {
-	background: #6CBE45;
+  background: #6cbe45;
 }
 
 .train .logo .name.L {
-	background: #A7A9AC;
+  background: #a7a9ac;
 }
 
-  
+.train .logo .name.M {
+  background: #ff6218;
+}
+
+.train .logo .name.J {
+  background: #996633;
+}
+
 .train .direction {
-	flex-grow: 3;
-	justify-content: center;
+  flex-grow: 3;
+  justify-content: center;
 }
 
 .train .time {
-	justify-content: flex-end;
-	flex-grow: 1;
+  justify-content: flex-end;
+  flex-grow: 1;
 }
