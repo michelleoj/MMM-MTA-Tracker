@@ -46,7 +46,6 @@ Module.register("mta-tracker", {
 	},
 
 	socketNotificationReceived: function(notification, payload) {
-		console.log(this.departureTimes);
 		switch (notification) {
 			case 'ON_DEPARTURE_TIME':
 				this.departureTimes = payload;
