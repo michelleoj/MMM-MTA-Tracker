@@ -1,4 +1,4 @@
-Module.register("mta-tracker", {
+Module.register("MMM-MTA-Tracker", {
 	defaults: {
 		apiKey: "",
 		stationIds: [101, 629],
@@ -28,10 +28,6 @@ Module.register("mta-tracker", {
 	},
 	
 	departureTimes: [],
-
-	getScripts: function(){
-		return [this.file("node_modules/lodash/lodash.js")];
-	},
 
 	getStyles: function() {
 		return [this.file("styles/mta-tracker.css")];
@@ -69,7 +65,7 @@ Module.register("mta-tracker", {
 			this.directionHash = this.setUpDirectionHash(data)
 			const subwayLinesElements = this.getSubwayLinesDOMElements(data);
 	
-			_.forEach(subwayLinesElements, (element) => {
+			subwayLinesElements.forEach((element) => {
 				wrapper.appendChild(element);
 			});
 		}
@@ -160,9 +156,7 @@ Module.register("mta-tracker", {
 		time.innerHTML = '--';
 		direction.innerHTML = this.config.trains[timeObj.routeId][dir]
 
-		if (!_.isEmpty(this.departureTimes)) {
-			time.innerHTML = `${timeObj.time} min`
-		}
+		time.innerHTML = `${timeObj.time} min`
 
 		logo.appendChild(name);
 		train.appendChild(logo);

@@ -6,13 +6,7 @@
  */
 
 const { createClient } = require('mta-realtime-subway-departures');
-const request = require("request");
-const rp = require('request-promise');
-const async = require('async');
-const GtfsRealtimeBinding = require("gtfs-realtime-bindings");
-const fs = require("fs");
 const NodeHelper = require("node_helper");
-const date = require('date-and-time');
 
 module.exports = NodeHelper.create({
 
