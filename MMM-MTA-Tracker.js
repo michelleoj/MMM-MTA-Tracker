@@ -83,11 +83,19 @@ Module.register("MMM-MTA-Tracker", {
 
 		data.forEach(station => {
 			station.times[0].nBound.forEach(ntime => {
-				directionHash[ntime.routeId].nDepartureTimes.push(ntime)
+				const route = directionHash[ntime.routeId]
+				
+				if (route) {
+					route.nDepartureTimes.push(ntime)
+				}
 			})
 
 			station.times[0].sBound.forEach(stime => {
-				directionHash[stime.routeId].sDepartureTimes.push(stime)
+				const route = directionHash[stime.routeId]
+
+				if (route) {
+					route.sDepartureTimes.push(stime)
+				}
 			})
 		})
 		
